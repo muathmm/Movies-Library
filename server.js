@@ -3,8 +3,14 @@ const fs = require('fs').promises;
 const axios = require('axios');
 const dotenv = require('dotenv').config();  
 const app = express();
+const pg=require('pg');
 const port = 3001;
 const apiKey = process.env.API_KEY; 
+
+const client=new pg.Client('postgressql://localhost:5432/moviesdb');
+
+app.use(express.json());
+
 
 function Movie(data) {
   this.title = data.title;
@@ -12,8 +18,9 @@ function Movie(data) {
   this.overview = data.overview;
 }
 
+app.get('/movie',getMovies)
+app.post('/movie',addmovie)
 app.get('/trending', trendingHandler);
-
 app.get('/search', async (req, res) => {
   const query = req.query.query;
   try {
@@ -75,8 +82,32 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/favorite', (req, res) => {
-  res.send('Welcome to Favorite Page');  // Corrected the spelling of 'Page'
+  res.send('Welcome to Favorite Page'); 
 });
+
+
+
+ function getMovies(req,res){
+  const sql='SELECT * from movie '
+  client.query(sql).then((data)=>{
+    res.send(data.rows)
+  }).catch((err)=>{
+    errorHandler(err,req,res);
+  })
+ }
+
+ function addmovie(req, res) {
+  const movie = req.body;
+  const sql = 'INSERT INTO movie (title, release_date, poster_path, overview) VALUES ($1, $2, $3, $4) RETURNING *';
+  const values = [movie.title, movie.release_date, movie.poster_path, movie.overview];
+  client.query(sql, values)
+      .then((data) => {
+          res.send('your data was added');
+      })
+      .catch((err) => {
+          errorHandler(err, req, res);
+      });
+}
 
 function trendingHandler(req, res) {
   axios.get(`https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}`)
@@ -107,7 +138,8 @@ function notFoundHandler(req, res, next) {
 
 app.use(errorHandler);
 app.use(notFoundHandler);
-
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+client.connect().then(()=>{
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+})
