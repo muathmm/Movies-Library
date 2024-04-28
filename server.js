@@ -85,8 +85,43 @@ app.get('/favorite', (req, res) => {
   res.send('Welcome to Favorite Page'); 
 });
 
+app.put('/movie/:id',hundleUpdateMovie)
+app.delete ('/movie/:id',handleDeleteMovie);
+app.get('/movies/:id',handleSpesificMovie)
 
+function handleSpesificMovie(req,res){
+  let id=req.params.id;
+  const sql=`SELECT * FROM movie where id=${id}`
+  client.query(sql).then((result)=>{
+    res.status(200).json(result.rows);
+  }).catch((err)=>{
+    errorHandler(err)
+  })
+}
 
+function handleDeleteMovie(req,res){
+  let id=req.params.id;
+  const sql=`DELETE FROM movie where id=${id}` ;
+  client.query(sql).then((result)=>{
+    res.send('the data is deleted ');
+  }).catch((err)=>{
+     errorHandler(err);
+  })
+}
+
+function hundleUpdateMovie(req,res){
+  let id=req.params.id;
+  const { title, release_date, poster_path, overview } = req.body;
+  const sql=`UPDATE movie SET title = $1, release_date = $2, poster_path = $3, overview = $4 WHERE id = ${id} RETURNING *;`
+  let values=[title,release_date,poster_path,overview];
+  client.query(sql,values).then((result)=>{
+    res.status(200).send('the data is updated')
+  }).catch((err)=>{
+    errorHandler(err);
+  })
+}
+
+ 
  function getMovies(req,res){
   const sql='SELECT * from movie '
   client.query(sql).then((data)=>{
