@@ -73,14 +73,7 @@ app.get('/popular', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  try {
-    const rawData = await fs.readFile('moviesData/movies.json');
-    const moviesData = JSON.parse(rawData);
-    const movie = new Movie(moviesData);
-    res.json(movie);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  res.send('Welcome to Favorite Page'); 
 });
 
 app.get('/favorite', (req, res) => {
