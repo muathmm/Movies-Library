@@ -7,8 +7,9 @@ const pg=require('pg');
 const port = 3001;
 const apiKey = process.env.API_KEY; 
 const cors=require('cors');
+const url =process.env.URL
 
-const client=new pg.Client('postgresql://postgres:YaaVGZohmnBwEWlDoKSdSFpDXgtZkYov@viaduct.proxy.rlwy.net:44980/railway');
+const client=new pg.Client(url);
 
 app.use(express.json());
 app.use(cors());
