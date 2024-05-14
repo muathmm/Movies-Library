@@ -6,11 +6,12 @@ const app = express();
 const pg=require('pg');
 const port = 3001;
 const apiKey = process.env.API_KEY; 
+const cors=require('cors');
 
 const client=new pg.Client('postgressql://localhost:5432/moviesdb');
 
 app.use(express.json());
-
+app.use(cors());
 
 function Movie(data) {
   this.title = data.title;
@@ -133,6 +134,7 @@ function hundleUpdateMovie(req,res){
 
  function addmovie(req, res) {
   const movie = req.body;
+  console.log (movie);
   const sql = 'INSERT INTO movie (title, release_date, poster_path, overview) VALUES ($1, $2, $3, $4) RETURNING *';
   const values = [movie.title, movie.release_date, movie.poster_path, movie.overview];
   client.query(sql, values)
