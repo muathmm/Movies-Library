@@ -8,7 +8,7 @@ const port = 3001;
 const apiKey = process.env.API_KEY; 
 const cors=require('cors');
 
-const client=new pg.Client('postgressql://localhost:5432/moviesdb');
+const client=new pg.Client('postgresql://postgres:YaaVGZohmnBwEWlDoKSdSFpDXgtZkYov@viaduct.proxy.rlwy.net:44980/railway');
 
 app.use(express.json());
 app.use(cors());
