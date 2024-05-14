@@ -9,7 +9,7 @@ const apiKey = process.env.API_KEY;
 const cors=require('cors');
 const url =process.env.URL
 
-const client=new pg.Client(url);
+const client=new pg.Client(`${url}`);
 
 app.use(express.json());
 app.use(cors());
